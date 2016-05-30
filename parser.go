@@ -92,7 +92,7 @@ func (p *parser) parseArgs(args []string) {
 	// CHECK FOR -h/--help
 	// ------------------------------
 	if args[0] == "--help" || args[0] == "-h" {
-		p.showHelp()
+		p.ShowHelp()
 		os.Exit(1)
 	}
 
@@ -152,7 +152,7 @@ func (p *parser) parseArgs(args []string) {
 		}
 	}
 	if invalidArgExists {
-		p.showHelp()
+		p.ShowHelp()
 		os.Exit(1)
 	}
 }
