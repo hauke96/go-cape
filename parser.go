@@ -1,4 +1,4 @@
-package main
+package cape
 
 import (
 	"fmt"
@@ -13,10 +13,6 @@ type parser struct {
 	KnownLongArgs  string
 	KnownShortArgs string
 	description    string
-}
-
-func main() {
-	fmt.Println("go-cape is a package to parse arguments in golang programs using chaines calls. More information can be found at https://github.com/hauke96/go-cape")
 }
 
 // NewParser creates an empty parser with no arguments.
