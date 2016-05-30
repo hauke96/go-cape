@@ -22,5 +22,5 @@ The `ipadress` argument is a required on. Not setting this will cause a error in
 
 ## TODO
 * Implement the required condition
-* Implement flags (e.g. just setting `-iLb` or `-i` and interpreting this as `true` for the matching arguments)
-* Remove `PREDEF: ` output
+* ~~Implement flags (e.g. just setting `-iLb` or `-i` and interpreting this as `true` for the matching arguments)~~
+* ~~Remove `PREDEF: ` output~~
