@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/hauke96/go-cape.svg?branch=master)](https://travis-ci.org/hauke96/go-cape)
 # go-cape
 go-cape (go-cape offers a chained argument parsing engine) is an argument parsing engine for go using chained method calls.
 
