@@ -157,7 +157,7 @@ func (p *parser) parseArgs(args []string) {
 	}
 }
 
-func (p *parser) showHelp() {
+func (p *parser) ShowHelp() {
 	writer := new(tabwriter.Writer)
 	writer.Init(os.Stdout, 0, 4, 2, ' ', 0)
 	defer writer.Flush()
