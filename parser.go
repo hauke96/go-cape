@@ -144,22 +144,18 @@ func (p *parser) parseArgs(args []string) {
 			}
 
 			if len(splittedArg) >= 2 { // argument with value
-				fmt.Fprintln(writer, "PREDEF:", key, "\t=", splittedArg[1])
 				p.args[key].set(splittedArg[1])
 			} else { // argument without value (=flag)
-				fmt.Fprintln(writer, "PREDEF:", key, "\t=", true)
 				p.args[key].set("true")
 			}
 		} else { // not valid
 			if len(key) == 1 { // just to have the - in from of the argument (a bit more pretty ;) )
 				key = "-" + key
 			}
-			fmt.Println("ERROR: Unknown argument", key, "!")
 			invalidArgExists = true
 		}
 	}
 	if invalidArgExists {
-		fmt.Println()
 		p.showHelp()
 		os.Exit(1)
 	}
