@@ -78,6 +78,7 @@ func (p *parser) Parse() {
 	if len(args) == 0 {
 		return
 	}
+
 	// ------------------------------
 	// CREATE OUTPUT WRITER
 	// ------------------------------
@@ -97,26 +98,12 @@ func (p *parser) Parse() {
 	// SPLIT COMBINED ARGS
 	// ------------------------------
 	// E.g. [-bgh] -> [-b] [-g] [-h]
-	newArgs := make([]string, 0)
-	for _, arg := range args {
-		if !strings.Contains(arg, "=") && arg[0] == '-' && arg[1] != '-' && len(arg) > 2 { // 3 because of - and at least 2 other characters
-
-			arg = arg[1:] // remove the -
-
-			for _, v := range arg {
-				newArgs = append(newArgs, "-"+string(v))
-			}
-		} else {
-			newArgs = append(newArgs, arg)
-		}
-	}
-
-	args = newArgs
-	invalidArgExists := false
+	args = splitCombinedArgs(args)
 
 	// ------------------------------
 	// SEPARATE INTO NORMAL AND PREDEFINING
 	// ------------------------------
+	invalidArgExists := false
 	for _, arg := range args {
 		splittedArg := strings.Split(arg, "=")
 		key := splittedArg[0]
@@ -152,6 +139,23 @@ func (p *parser) Parse() {
 		p.ShowHelp()
 		os.Exit(1)
 	}
+}
+
+func (p *parser) splitCombinedArgs(args []string) []string {
+	newArgs := make([]string, 0)
+	for _, arg := range args {
+		if !strings.Contains(arg, "=") && arg[0] == '-' && arg[1] != '-' && len(arg) > 2 { // 3 because of - and at least 2 other characters
+
+			arg = arg[1:] // remove the -
+
+			for _, v := range arg {
+				newArgs = append(newArgs, "-"+string(v))
+			}
+		} else {
+			newArgs = append(newArgs, arg)
+		}
+	}
+	return newArgs
 }
 
 func (p *parser) ShowHelp() {
