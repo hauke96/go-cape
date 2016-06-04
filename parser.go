@@ -74,8 +74,9 @@ func (p *parser) RegisterArgument(longKey, shortKey, help string) *argument {
 // This function also takes the arguments and parses them into two categories: normal and predefinings arguments.
 // It also evaluates the predefining ones.
 func (p *parser) Parse() {
-	args := os.Args[1:]
-
+	p.parseArgs(os.Args[1:])
+}
+func (p *parser) parseArgs(args []string) {
 	if len(args) == 0 {
 		return
 	}
@@ -110,16 +111,15 @@ func (p *parser) Parse() {
 		key, err := p.truncateArg(splittedArg[0])
 		if err != nil {
 			fmt.Println(err.Error())
-			os.Exit(1)
+			invalidArgExists = true
+			break
 		}
 
-		// the argument if one of the registered ones
-		if len(key) == 1 && strings.Contains(p.KnownShortArgs, ":"+key+":") ||
-			len(key) > 1 && strings.Contains(p.KnownLongArgs, ":"+key+":") { // is it a valid short or long argument?
+		key = p.toShortKey(key)
 
-			if len(key) > 1 { // long argument like --foo and not -f
-				key = p.longToShortArg[key]
-			}
+		// the argument if one of the registered ones
+		if strings.Contains(p.KnownShortArgs, ":"+key+":") ||
+			strings.Contains(p.KnownLongArgs, ":"+key+":") { // is it a valid short or long argument?
 
 			if len(splittedArg) >= 2 { // argument with value
 				p.args[key].set(splittedArg[1])
@@ -131,6 +131,7 @@ func (p *parser) Parse() {
 				key = "-" + key
 			}
 			invalidArgExists = true
+			break
 		}
 	}
 	if invalidArgExists {
@@ -181,6 +182,14 @@ func (p *parser) truncateArg(arg string) (string, error) {
 	}
 
 	return arg, nil
+}
+
+// toShortKey takes any key and returns the short version of this. Not allowed are keys that begin with a dash!
+func (p *parser) toShortKey(key string) string {
+	if len(key) > 1 { // not a short key -> convert
+		key = p.longToShortArg[key]
+	}
+	return key
 }
 
 func (p *parser) ShowHelp() {

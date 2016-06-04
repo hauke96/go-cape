@@ -19,6 +19,7 @@ func main() {
 		os.Args = append(os.Args, "-d=true")
 		os.Args = append(os.Args, "--eee=hello") //you can also disable this
 		os.Args = append(os.Args, "-fg")
+		os.Args = append(os.Args, "--hhh")
 	}
 
 	parser := cape.NewParser()
@@ -30,6 +31,7 @@ func main() {
 	e := parser.RegisterArgument("eee", "e", "Eehh ... some other argument i guess ...").Default("lool").String()
 	f := parser.RegisterArgument("fff", "f", "First combined arg.").Bool()
 	g := parser.RegisterArgument("ggg", "g", "Second combined arg.").Bool()
+	h := parser.RegisterArgument("hhh", "h", "A long flag.").Default("false").String()
 
 	parser.Parse()
 
@@ -40,6 +42,7 @@ func main() {
 	fmt.Println("eee/e:", *e)
 	fmt.Println("fff/f:", *f)
 	fmt.Println("ggg/g:", *g)
+	fmt.Println("hhh/h:", *h)
 
 	parser.ShowHelp()
 }
