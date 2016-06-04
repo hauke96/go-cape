@@ -115,7 +115,12 @@ func (p *parser) parseArgs(args []string) {
 			break
 		}
 
-		key = p.toShortKey(key)
+		key, err = p.toShortKey(key)
+		if err != nil {
+			fmt.Println(err.Error())
+			invalidArgExists = true
+			break
+		}
 
 		// the argument if one of the registered ones
 		if strings.Contains(p.KnownShortArgs, ":"+key+":") ||
@@ -185,11 +190,17 @@ func (p *parser) truncateArg(arg string) (string, error) {
 }
 
 // toShortKey takes any key and returns the short version of this. Not allowed are keys that begin with a dash!
-func (p *parser) toShortKey(key string) string {
+func (p *parser) toShortKey(key string) (string, error) {
+	if key[0] == '-' {
+		return key, errors.New("Key beginning with a dash is not allowed here!")
+	}
 	if len(key) > 1 { // not a short key -> convert
 		key = p.longToShortArg[key]
+		if key == "" {
+			return key, errors.New("There's no entry for the key " + key + ".")
+		}
 	}
-	return key
+	return key, nil
 }
 
 func (p *parser) ShowHelp() {
