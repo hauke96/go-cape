@@ -70,14 +70,11 @@ func (p *parser) RegisterArgument(longKey, shortKey, help string) *argument {
 }
 
 // Parse goes through the arguments (from 1 to n, so the first one is skiped) and sets the values of the arguments
-func (p *parser) Parse() {
-	p.parseArgs(os.Args[1:])
-}
-
-// parseArgs takes the arguments and parses them into two categories:
-// normal and predefinings arguments.
+// This function also takes the arguments and parses them into two categories: normal and predefinings arguments.
 // It also evaluates the predefining ones.
-func (p *parser) parseArgs(args []string) {
+func (p *parser) Parse() {
+	args := os.Args[1:]
+
 	if len(args) == 0 {
 		return
 	}
