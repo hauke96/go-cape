@@ -64,6 +64,7 @@ func (a *argument) Default(value string) *argument {
 // If it's a bool, only the bool field is set
 // If it's an int, the int and string field is set.
 func (a *argument) set(value string) {
+	*a.stringValue = value
 	intValue, err := strconv.Atoi(value)
 	if err == nil {
 		*a.intValue = intValue
@@ -72,8 +73,5 @@ func (a *argument) set(value string) {
 	boolValue, err := strconv.ParseBool(value)
 	if err == nil {
 		*a.boolValue = boolValue
-		return
 	}
-
-	*a.stringValue = value
 }
