@@ -1,6 +1,7 @@
 package cape
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -98,7 +99,7 @@ func (p *parser) Parse() {
 	// SPLIT COMBINED ARGS
 	// ------------------------------
 	// E.g. [-bgh] -> [-b] [-g] [-h]
-	args = splitCombinedArgs(args)
+	args = p.splitCombinedArgs(args)
 
 	// ------------------------------
 	// SEPARATE INTO NORMAL AND PREDEFINING
@@ -106,16 +107,13 @@ func (p *parser) Parse() {
 	invalidArgExists := false
 	for _, arg := range args {
 		splittedArg := strings.Split(arg, "=")
-		key := splittedArg[0]
-
-		// notice: only --foo or -f are allowed, -foo and --f are not allwed!
-		// This is just to have the normal feeling of arguments in linux, blame me but i like it ;)
-		if key[0:2] == "--" && len(key) > 3 { // 3 because of -- and at least 2 other characters
-			key = key[2:]
-		} else if len(key) == 2 { // - and one other character
-			key = key[1:]
+		key, err := p.truncateArg(splittedArg[0])
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
+		// the argument if one of the registered ones
 		if len(key) == 1 && strings.Contains(p.KnownShortArgs, ":"+key+":") ||
 			len(key) > 1 && strings.Contains(p.KnownLongArgs, ":"+key+":") { // is it a valid short or long argument?
 
@@ -141,9 +139,14 @@ func (p *parser) Parse() {
 	}
 }
 
+// splitCombinedArgs splitts combined args :o
+// A combined arg is something like -bgl which will be split into -b -g -l
 func (p *parser) splitCombinedArgs(args []string) []string {
 	newArgs := make([]string, 0)
 	for _, arg := range args {
+		// !strings.Contains(arg, "=")		- A = is not allowed because -bgl are all flags/short args
+		// arg[0] == '-' && arg[1] != '-' 	- There's only one - allowed
+		// len(arg) > 2						- Only string of the form -[a-Z0-9] are valid
 		if !strings.Contains(arg, "=") && arg[0] == '-' && arg[1] != '-' && len(arg) > 2 { // 3 because of - and at least 2 other characters
 
 			arg = arg[1:] // remove the -
@@ -156,6 +159,28 @@ func (p *parser) splitCombinedArgs(args []string) []string {
 		}
 	}
 	return newArgs
+}
+
+// truncateArg removes the dashes in the beginning of an argument and returns the plain key.
+// If the argument wasn't valid (like -test or --t ) the original argument and an error will be returned.
+func (p *parser) truncateArg(arg string) (string, error) {
+	// notice: only --foo or -f are allowed, -foo and --f are not allowed!
+	// This is just to have the normal feeling of arguments in linux, blame me but i like it ;)
+	if arg[0:2] == "--" {
+		if len(arg) > 3 { // greater 3 because of -- (two dashes) and at least 2 other characters
+			return arg[2:], nil
+		} else { // something like --f which is invalid
+			return arg, errors.New("The argument " + arg + " is not valid! Something like " + arg[1:] + " would be ok.")
+		}
+	} else if len(arg) == 2 { // - and one other character
+		arg = arg[1:]
+	} else if arg == "-" {
+		return arg, errors.New("What? The argument " + arg + " doesn't make any sense.")
+	} else {
+		return arg, errors.New("I have no idea what " + arg + " means, sorry.")
+	}
+
+	return arg, nil
 }
 
 func (p *parser) ShowHelp() {
