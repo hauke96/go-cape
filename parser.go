@@ -49,25 +49,17 @@ func (p *parser) RegisterArgument(longKey, shortKey, help string) *argument {
 		return nil
 	}
 
-	stdString := ""
-	stdInt := 0
-	stdBool := false
-
-	a := argument{
-		longKey:     longKey,
-		shortKey:    shortKey,
-		helpText:    help,
-		stringValue: &stdString,
-		intValue:    &stdInt,
-		boolValue:   &stdBool,
-	}
+	a := newArgument()
+	a.longKey = longKey
+	a.shortKey = shortKey
+	a.helpText = help
 
 	p.KnownShortArgs += shortKey + ":"
 	p.KnownLongArgs += longKey + ":"
 	p.longToShortArg[longKey] = shortKey
 
-	p.args[shortKey] = &a
-	return &a
+	p.args[shortKey] = a
+	return a
 }
 
 // Parse goes through the arguments (from 1 to n, so the first one is skiped) and sets the values of the arguments
