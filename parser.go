@@ -10,6 +10,7 @@ import (
 type parser struct {
 	args           map[string]*argument
 	longToShortArg map[string]string
+	requiredArgs   []*argument
 	KnownLongArgs  string
 	KnownShortArgs string
 	description    string
@@ -81,12 +82,6 @@ func (p *parser) parseArgs(args []string) {
 	if len(args) == 0 {
 		return
 	}
-	// ------------------------------
-	// CREATE OUTPUT WRITER
-	// ------------------------------
-	writer := new(tabwriter.Writer)
-	writer.Init(os.Stdout, 0, 4, 2, ' ', 0)
-	defer writer.Flush()
 
 	// ------------------------------
 	// CHECK FOR -h/--help
@@ -94,6 +89,15 @@ func (p *parser) parseArgs(args []string) {
 	if args[0] == "--help" || args[0] == "-h" {
 		p.ShowHelp()
 		os.Exit(1)
+	}
+
+	// ------------------------------
+	// GET ALL REQUIRED ARGS
+	// ------------------------------
+	for _, arg := range p.args {
+		if arg.required {
+			p.requiredArgs = append(p.requiredArgs, arg)
+		}
 	}
 
 	// ------------------------------
@@ -139,16 +143,23 @@ func (p *parser) parseArgs(args []string) {
 				key = p.longToShortArg[key]
 			}
 
+			arg := p.args[key]
 			if len(splittedArg) >= 2 { // argument with value
-				p.args[key].set(splittedArg[1])
+				arg.set(splittedArg[1])
 			} else { // argument without value (=flag)
-				p.args[key].set("true")
+				arg.set("true")
 			}
+
+			if arg.required {
+				p.requiredArgs = remove(p.requiredArgs, arg)
+			}
+
 		} else { // not valid
 			if len(key) == 1 { // just to have the - in from of the argument (a bit more pretty ;) )
 				key = "-" + key
 			}
 			invalidArgExists = true
+			break
 		}
 	}
 	if invalidArgExists {
@@ -187,4 +198,19 @@ func (p *parser) ShowHelp() {
 		fmt.Fprintln(writer, p.description)
 	}
 	fmt.Fprintln(writer, "")
+}
+
+func remove(a []*argument, e *argument) []*argument {
+	i := 0
+	for j, v := range a {
+		if v == e {
+			i = j
+			break
+		}
+	}
+
+	if i != 0 && i+1 < len(a) {
+		a = append(a[:i], a[i+1:]...)
+	}
+	return a
 }
