@@ -14,6 +14,18 @@ type argument struct {
 	boolValue   *bool
 }
 
+func newArgument() *argument {
+	stdString := ""
+	stdInt := 0
+	stdBool := false
+
+	return &argument{
+		stringValue: &stdString,
+		intValue:    &stdInt,
+		boolValue:   &stdBool,
+	}
+}
+
 // String defines this argument as an argument that contains a string.
 // After calling 'Parse' on the parser this argument belongs to, the value will be set
 func (a *argument) String() *string {
@@ -64,6 +76,7 @@ func (a *argument) Default(value string) *argument {
 // If it's a bool, only the bool field is set
 // If it's an int, the int and string field is set.
 func (a *argument) set(value string) {
+	*a.stringValue = value
 	intValue, err := strconv.Atoi(value)
 	if err == nil {
 		*a.intValue = intValue
@@ -72,8 +85,5 @@ func (a *argument) set(value string) {
 	boolValue, err := strconv.ParseBool(value)
 	if err == nil {
 		*a.boolValue = boolValue
-		return
 	}
-
-	*a.stringValue = value
 }

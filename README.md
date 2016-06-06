@@ -2,6 +2,9 @@
 # go-cape
 go-cape (go-cape offers a chained argument parsing engine) is an argument parsing engine for go using chained method calls.
 
+## Install and update `go-cape`
+To install or update `go-cape` just execute `go get -u github.com/hauke96/go-cape`.
+
 ## Chained calls
 Chained method calls are calls like this:
 ```
